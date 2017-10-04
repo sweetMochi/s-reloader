@@ -22,26 +22,26 @@ All js runing in ECMAScript 5.
 
 1. Set your path.
 ```php
-	$GLOBALS["path_static"] = "/resource";
-	$GLOBALS["url_static"] = "//" . $_SERVER['SERVER_NAME'] . "/resource";
+$GLOBALS["path_static"] = "/resource";
+$GLOBALS["url_static"] = "//" . $_SERVER['SERVER_NAME'] . "/resource";
 ```
 
 2. Copy file to resource folder.
 
 3. Index your resource by loading order.
 ```php
-	$GLOBALS["resource"] = array(
-		"aos_css" => array(
-			"type" => "require",
-			"base" => "static",
-			"path" => "/js/aos/2.1.1/min.css",
-			"loading" => "later",
-		),
-		"index_css" => array(
-			"type" => "require",
-			"path" => "/css/index.css",
-		),
-	);
+$GLOBALS["resource"] = array(
+	"aos_css" => array(
+		"type" => "require",
+		"base" => "static",
+		"path" => "/js/aos/2.1.1/min.css",
+		"loading" => "later",
+	),
+	"index_css" => array(
+		"type" => "require",
+		"path" => "/css/index.css",
+	),
+);
 ```
 	type: null(default) | require
 		[default]：Resource loading in <script src=""> or <link rel="stylesheet" href="">
@@ -61,19 +61,19 @@ All js runing in ECMAScript 5.
 4. Setting loading resource in App.class, becare in dependence order.
 
 ```php
-	$resource_html = resource_manager(array(
-		"aos_css",
-		"index_css",
-		"aos",
-		"jquery",
-		"slides",
-		"index",
-	));
+$resource_html = resource_manager(array(
+	"aos_css",
+	"index_css",
+	"aos",
+	"jquery",
+	"slides",
+	"index",
+));
 ```
 
 And if you have some var or array. Passing php to js, you can use like this:
 ```php
-	$js_var_html = js_var(array(
-		"var" => $var,
-	));
+$js_var_html = js_var(array(
+	"var" => $var,
+));
 ```
