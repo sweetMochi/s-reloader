@@ -1,5 +1,5 @@
 <?
-	class AppAction {
+	class AppModule {
 
 		public function index () {
 
@@ -50,7 +50,9 @@
 				"index",
 			));
 
-			$js_var_html = js_var($GLOBALS["js_var"]);
+			$js_var_html = js_var(array(
+				"var" => $var,
+			));
 
 			require_once("view/index.php");
 		}

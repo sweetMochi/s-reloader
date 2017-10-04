@@ -1,5 +1,8 @@
 <?
 
+	require_once("lib/Common.func.php");
+	require_once("lib/routes.php");
+
 	$GLOBALS["path_static"] = "/resource";
 	$GLOBALS["url_static"] = "//" . $_SERVER['SERVER_NAME'] . "/resource";
 

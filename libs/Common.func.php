@@ -129,28 +129,4 @@
 		}
 		return $microdata_html;
 	}
-
-	// Stage link, if game release then add links, or just append coming soon.
-	function userLink() {
-
-		$user_link["coming"] = ' onclick="comingBox()"';
-
-		if ( $GLOBALS["link"]["fb_fans"] ) {
-			$user_link["fb_fans"] = 'href="' . $GLOBALS["link"]["fb_fans"] . '" target="_blank"';
-		} else {
-			$user_link["fb_fans"] = $user_link["coming"];
-		}
-
-		if ( $GLOBALS["game"]["release"] ) {
-			$user_link["pay"] = 'data-open="800x1000" href="' . $GLOBALS["link"]["pay"] . '&form=' . $GLOBALS["app_sign"] . '"';
-			$user_link["gift"] = 'data-open="500x800" href="' . $GLOBALS["link"]["gift"] . '&form=' . $GLOBALS["app_sign"] . '"';
-			$user_link["service"] = 'data-open="500x800" href="' . $GLOBALS["link"]["service"] . '&form=' . $GLOBALS["app_sign"] . '"';
-		} else {
-			$user_link["pay"] = $user_link["coming"];
-			$user_link["gift"] = $user_link["coming"];
-			$user_link["service"] = $user_link["coming"];
-		}
-
-		return $user_link;
-	}
 ?>
