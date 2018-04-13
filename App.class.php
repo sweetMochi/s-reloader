@@ -11,10 +11,6 @@
 				"inLanguage" => $GLOBALS["game"]["lang"],
 				"dateCreated" => $GLOBALS["game"]["create_time"],
 				"downloadUrl" => "",
-				"publisher" => array(
-					"name" => "",
-					"type" => "Organization",
-				),
 				"offers" => array(
 					"name" => "",
 					"price" => "0",

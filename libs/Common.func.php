@@ -10,14 +10,12 @@
 
 			$resource_value = $GLOBALS["resource"][$resource_key];
 			$resource_is_css = strpos($resource_value["path"], ".css") !== false;
+			$resource_base = $resource_value["base"] ? $resource_value["base"] : "resource";
+			$resource_base_path = $GLOBALS["path_" . $resource_base];
 
 			if ( $resource_value["type"] == "require" ) {
-				$resource_base = $resource_value["base"] ? $resource_value["base"] : "resource";
-				$resource_base_path = $GLOBALS["path_" . $resource_base];
 				$resource_item = file_get_contents($resource_base_path . $resource_value["path"]);
 			} else {
-				$resource_base = $resource_value["base"] ? $resource_value["base"] : "resource";
-				$resource_base_url = $GLOBALS["url_" . $resource_base];
 				$resource_url = $resource_base_url . $resource_value["path"];
 			}
 
@@ -98,27 +96,9 @@
 			"offers" => "Offer",
 			"aggregateRating" => "AggregateRating",
 		);
-
-		if ( $GLOBALS["game"]["type"] == "mobile" ) {
-			$microdata_type = "MobileApplication";
-			$microdata["downloadUrl"] = $GLOBALS["download"]["android"];
-			$microdata["operatingSystem"] = "";
-			unset($microdata["browserRequirements"]);
-			if ( $GLOBALS["download"]["android"] ) {
-				$microdata["downloadUrl"] = $meta_mobile['mobile_android_url'];
-				$microdata["operatingSystem"] .= "Android,";
-			}
-			if ( $GLOBALS["download"]["ios"] ) {
-				$microdata["operatingSystem"] .= "iOS";
-			}
-			if ( $GLOBALS["download"]["apk"] ) {
-				$microdata["downloadUrl"] = $meta_mobile['mobile_apk_url'];
-			}
-		}
-
 		foreach ($microdata as $microdata_key => $microdata_value ) {
 			if ( is_array($microdata_value) ) {
-				$microdata_html .= '<div itemprop="' . $microdata_key . '"  itemtype="' . $microdata_item[$microdata_key] . '">';
+				$microdata_html .= '<div itemprop="' . $microdata_key . '" itemscope itemtype="http://schema.org/' . $microdata_item[$microdata_key] . '">';
 				foreach ($microdata_value as $item_key => $item_value ) {
 					$microdata_html .= '<meta itemprop="' . $item_key . '" content="' . $item_value . '">';
 				}

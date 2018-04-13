@@ -1,9 +1,10 @@
 <?
 
-	require_once("lib/Common.func.php");
-	require_once("lib/routes.php");
+	require("libs/Common.func.php");
+	require("libs/routes.php");
 
-	$GLOBALS["path_static"] = "/resource";
+	$GLOBALS["path_static"] = dirname(__FILE__) . "/static";
+	$GLOBALS["path_resource"] = dirname(__FILE__) . "/resource";
 	$GLOBALS["url_static"] = "//" . $_SERVER['SERVER_NAME'] . "/resource";
 
 	$GLOBALS["resource"] = array(
@@ -30,7 +31,7 @@
 		"jquery" => array(
 			"type" => "require",
 			"base" => "static",
-			"path" => "/js/jquery/2.1.4.js",
+			"path" => "/js/jquery/3.1.0.js",
 			"loading" => "later",
 		),
 		"slides" => array(
@@ -46,7 +47,7 @@
 		),
 		"font_awesome" => array(
 			"type" => "link",
-			"path" => "/webfont/font-awesome/4.5.0/css/min.css",
+			"path" => "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
 			"loading" => "later",
 		),
 	);

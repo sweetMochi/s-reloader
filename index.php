@@ -1,4 +1,4 @@
 <?
-	require_once("int.php");
+	require("init.php");
 	appRun();
 ?>
