@@ -1,50 +1,40 @@
 <?
 	// All css and script rearrangement
-	// [later] = load in bottom of body
-	// [require] = require as script tag or style tag in line
 	function resource_manager($resource_list) {
 
-		$resource_html = array();
+		$html = array();
+		$tag_name = "data-rid";
+		$default_type = "require";
+		$file_tag = array(
+			"css" => "style",
+			"js" => "script",
+		);
 
-		foreach ($resource_list as $resource_key ) {
+		foreach ($resource_list as $key ) {
 
-			$resource_value = $GLOBALS["resource"][$resource_key];
-			$resource_is_css = strpos($resource_value["path"], ".css") !== false;
-			$resource_base = $resource_value["base"] ? $resource_value["base"] : "resource";
-			$resource_base_path = $GLOBALS["path_" . $resource_base];
+			$value = $GLOBALS["resource"][$key];
+			$file = strpos($value["path"], ".css") !== false || $value["file"] == "css" ? "css" : "js";
+			$link = $value["link"];
+			$base = $value["base"] ? $value["base"] : "resource";
+			$preload = $value["preload"];
 
-			if ( $resource_value["type"] == "require" ) {
-				$resource_item = file_get_contents($resource_base_path . $resource_value["path"]);
+			if ( !$link ) {
+				$require_item = file_get_contents($GLOBALS["path_" . $base] . $value["path"]);
+				$html_line = '<' . $file_tag[$file] . ' ' . $tag_name . '="' . $key . '">' . $require_item . '</' . $file_tag[$file] . '>';
 			} else {
-				$resource_url = $resource_base_url . $resource_value["path"];
-			}
-
-			if ( $resource_is_css ) {
-				if ( $resource_value["type"] == "require" ) {
-					$resource_style = "<style>" . $resource_item . "</style>\n";
+				$exteral = strpos($value["path"], "//") !== false || $value["base"] == "exteral" ? true : false;
+				$resource_url = $exteral ? $value["path"] : $GLOBALS["url_" . $base] . $value["path"];
+				if ( $file == "css" ) {
+					$html_line = '<link ' . $tag_name . '="' . $key . '" rel="stylesheet" href="' . $resource_url . '">';
 				} else {
-					$resource_style = '<link rel="stylesheet" href="' . $resource_url . '">';
-				}
-				if ( $resource_value["loading"] == "later" ) {
-					$resource_html["later_style"] .= $resource_style;
-				} else {
-					$resource_html["head_style"] .= $resource_style;
-				}
-			} else {
-				if ( $resource_value["type"] == "require" ) {
-					$resource_script = "<script>" . $resource_item . "</script>\n";
-				} else {
-					$resource_script = '<script src="' . $resource_url . '"></script>';
-				}
-				if ( $resource_value["loading"] == "later" ) {
-					$resource_html["later_script"] .= $resource_script;
-				} else {
-					$resource_html["head_script"] .= $resource_script;
+					$html_line = '<script ' . $tag_name . '="' . $key . '" src="' . $resource_url . '"></script>';
 				}
 			}
+			$load_tag = $preload ? "head" : "later";
+			$html[$load_tag . "_" . $file_tag[$file]] .= $html_line;
 		}
 
-		return $resource_html;
+		return $html;
 
 		// echo html var
 		// $resource_html["head_style"];
