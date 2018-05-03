@@ -32,36 +32,38 @@ $GLOBALS["url_static"] = "//" . $_SERVER['SERVER_NAME'] . "/resource";
 ```php
 $GLOBALS["resource"] = array(
 	"aos_css" => array(
-		"type" => "require",
 		"base" => "static",
 		"path" => "/js/aos/2.1.1/min.css",
-		"loading" => "later",
 	),
 	"index_css" => array(
-		"type" => "require",
+		"preload" => true,
 		"path" => "/css/index.css",
 	),
 );
 ```
-	type: null(default) | require
-		[default]：Resource loading in <script src=""> or <link rel="stylesheet" href="">
-		[require]： Resource loading in <script></script> or <style></style>
-
 	base: null(default) | static
 		[default]：Loading in resource folder.
 		[static]：Loading in predefind domain or server folder.
 
-	path: Can't not be empty value.
+	path: Can't not be empty.
 		This is path in "var/www/static" and "static.exsample.com" should be the same.
 
-	loading: null(default) | later
+	preload: null(default) | true.
+		[default]：Loading in head tag, whether in <script src=""> or <script></script>.
+		[true]：Loading resource in the end before body.
+
+	(Deprecated)type: null(default) | require
+		[default]：Resource loading in <script src=""> or <link rel="stylesheet" href="">
+		[require]： Resource loading in <script></script> or <style></style>
+
+	(Deprecated)loading: null(default) | later
 		[default]：Loading in head tag, whether in <script src=""> or <script></script>.
 		[later]：Loading resource in the end before body.
 
 4. Setting loading resource in App.class, becare in dependence order.
 
 ```php
-$resource_html = resource_manager(array(
+$resource_html = $App->resource(array(
 	"aos_css",
 	"index_css",
 	"aos",
@@ -73,7 +75,7 @@ $resource_html = resource_manager(array(
 
 And if you have some var or array. Passing php to js, you can use like this:
 ```php
-$js_var_html = js_var(array(
+$js_var_html = $App->js_var(array(
 	"var" => $var,
 ));
 ```

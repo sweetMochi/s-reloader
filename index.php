@@ -1,4 +1,4 @@
 <?
 	require("init.php");
-	appRun();
+	$App->run();
 ?>

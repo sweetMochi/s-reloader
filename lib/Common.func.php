@@ -1,6 +1,34 @@
 <?
+class App {
+
+	public function run() {
+
+		// require the file that matches the controller name
+		// create a new instance of the needed controller
+		// call the action
+
+		$module = "apps";
+		$action = "index";
+
+		if ( !isset($_GET["module"]) ) {
+			$get_module = "App.class.php";
+		} else {
+			$get_module = "module/" . ucfirst($_GET["module"]) . ".class.php";
+		}
+
+		if ( file_exists($get_module) ) {
+			$action = $_GET["action"] ? $_GET["action"] : $action;
+		} else {
+			exit;
+		}
+
+		require_once($get_module);
+		$module = new AppModule();
+		$module->{ $action }();
+	}
+
 	// All css and script rearrangement
-	function resource_manager($resource_list) {
+	public function resource($list) {
 
 		$html = array();
 		$tag_name = "data-rid";
@@ -10,7 +38,7 @@
 			"js" => "script",
 		);
 
-		foreach ($resource_list as $key ) {
+		foreach ( $list as $key ) {
 
 			$value = $GLOBALS["resource"][$key];
 			$file = strpos($value["path"], ".css") !== false || $value["file"] == "css" ? "css" : "js";
@@ -47,7 +75,7 @@
 	// PHP var convert to JS var
 	// if php var is array, then echo json in html
 	// if php var is number, then echo number
-	function js_var ($js_var) {
+	public function js_var ($js_var) {
 
 		$js_var_html = '<script id="js-var">';
 		foreach ($js_var as $js_var_key => $js_var_value ) {
@@ -63,23 +91,28 @@
 			$js_var_html .= ';';
 		}
 		$js_var_html .= '</script>';
-
 		return $js_var_html;
-
 	}
 
-	function meta_manager ($meta, $property = array()) {
-		$meta_html = "";
-		foreach ($meta as $meta_key => $meta_value ) {
-			$meta_html .= '<meta name="' . $meta_key . '" content="' . $meta_value . '">';
-		}
-		foreach ($property as $property_key => $property_value ) {
-			$meta_html .= '<meta property="' . $property_key . '" content="' . $property_value . '">';
+	// SEO meta formate
+	public function meta ($option = array(
+		"title" => "",
+		"name" => array(),
+		"property" => array(),
+	)) {
+		$meta_html = '<meta charset="UTF-8"><title>' . $option["title"] . '</title>';
+		$meta_html .= '<link type="image/x-icon" rel="shortcut icon" href="' . $GLOBALS["site"]["favicon"] . '">';
+		unset($option["title"]);
+		foreach ($option as $key => $value) {
+			foreach ($value as $meta_key => $meta_value ) {
+				$meta_html .= '<meta ' . $key . '="' . $meta_key . '" content="' . $meta_value . '">';
+			}
 		}
 		return $meta_html;
 	}
 
-	function microdata_manager ($microdata) {
+	// Microdata formate
+	public function microdata ($microdata) {
 		$microdata_html = "";
 		$microdata_item = array(
 			"image" => "ImageObject",
@@ -99,4 +132,50 @@
 		}
 		return $microdata_html;
 	}
+
+	// Render html and passing php vars
+	public function render ($view, $data = array() ) {
+		$data["App"] = new App;
+		$data["body_style"] = $data["body_style"] ? " class='{$data["body_style"]}'" : "";
+		$data["content"] = $this->view("page/{$view}", $data);
+		echo $this->view("layout", $data);
+	}
+
+	public function view ($view, $data = array()) {
+		$path = "{$GLOBALS["path_view"]}/{$view}.tpl";
+		ob_start();
+		if ( !empty($data) ) { extract($data); }
+		require($path);
+		return ob_get_clean();
+	}
+
+	public function pageMsg ($title, $url = "") {
+
+		$url = $url == "" ? $GLOBALS["site"]["url"] : $url;
+		$meta_html = $this->meta(array(
+			"title" => $title,
+			"name" => array(
+				"theme-color" => "#000000",
+				"viewport" => "width=device-width, minimum-scale=1.0, user-scalable=no",
+			),
+		));
+
+		$resource_html = $this->resource(array(
+			"index_css",
+			"cwtexyen_css",
+			"font_awesome",
+		));
+
+		$data["url"] = $url;
+		$data["title"] = $title;
+		$data["body_style"] = "msg";
+		$data["meta_html"] = $meta_html;
+		$data["resource_html"] = $resource_html;
+		render ("msg", $data);
+
+	}
+}
+
+$App = new App;
+
 ?>
