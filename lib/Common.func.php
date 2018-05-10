@@ -73,20 +73,16 @@ class App {
 	}
 
 	// PHP var convert to JS var
-	// if php var is array, then echo json in html
-	// if php var is number, then echo number
-	public function js_var ($js_var) {
-
+	// PHP var can be three types: boolean, array, numeric
+	function js_var ($js_var) {
 		$js_var_html = '<script id="js-var">';
 		foreach ($js_var as $js_var_key => $js_var_value ) {
 			$js_var_html .= 'window["' . $js_var_key . '"]=';
-			if ( is_array($js_var_value) ) {
-				$js_var_html .= json_encode($js_var_value);
-			} else
-			if ( is_numeric($js_var_value) ) {
-				$js_var_html .= $js_var_value;
-			} else {
-				$js_var_html .= '"' . $js_var_value . '"';
+			switch (true) {
+				case is_bool($js_var_value): $js_var_html .= $js_var_value ? "true" : "false"; break;
+				case is_array($js_var_value): $js_var_html .= json_encode($js_var_value); break;
+				case is_numeric($js_var_value): $js_var_html .= $js_var_value; break;
+				default: $js_var_html .= '"' . $js_var_value . '"';
 			}
 			$js_var_html .= ';';
 		}
