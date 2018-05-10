@@ -107,26 +107,82 @@ class App {
 		return $meta_html;
 	}
 
-	// Microdata formate
-	public function microdata ($microdata) {
-		$microdata_html = "";
-		$microdata_item = array(
+	// Structured Data: json-dl and microdata
+	function structuredData ($data = array(), $type = "json-dl") {
+
+		$html = "";
+		$data_type = $data["type"];
+		$data_item = array(
 			"image" => "ImageObject",
 			"offers" => "Offer",
 			"aggregateRating" => "AggregateRating",
 		);
-		foreach ($microdata as $microdata_key => $microdata_value ) {
-			if ( is_array($microdata_value) ) {
-				$microdata_html .= '<div itemprop="' . $microdata_key . '" itemscope itemtype="http://schema.org/' . $microdata_item[$microdata_key] . '">';
-				foreach ($microdata_value as $item_key => $item_value ) {
-					$microdata_html .= '<meta itemprop="' . $item_key . '" content="' . $item_value . '">';
+
+		$structure = array(
+			"microdata" => array(
+				"wrap_start" => "",
+				"open" => array( "<div itemprop='", "' itemscope itemtype='http://schema.org/", "'>" ),
+				"mid" => array( "<meta itemprop='", "' content='", "'>" ),
+				"close" => "</div>",
+				"item" => array( "<div itemprop='", "' content='", "'>" ),
+				"wrap_end" => "",
+			),
+			"json-dl" => array(
+				"wrap_start" => '<script type="application/ld+json">{"@context":"http://schema.org/",',
+				"open" => array( '"', '":{"@type":"', '",' ),
+				"mid" => array( '"', '":"', '",' ),
+				"close" => "},",
+				"item" => array( '"', '":"', '",' ),
+				"wrap_end" => "}</script>",
+			),
+		);
+
+		unset($data["type"]);
+
+		function scope($key, $value, $structure, $type, $data_item) {
+			$scope_html = "";
+			$scope_html .= $structure[$type]["open"][0] . $key . $structure[$type]["open"][1] . $data_item[$key] . $structure[$type]["open"][2];
+			foreach ($value as $item_key => $item_value ) {
+				if (  is_array($item_value) ) {
+					$scope_html .= scope($item_key, $item_value, $structure, $type, $data_item);
+				} else {
+					$scope_html .= prop($item_key, $item_value, $structure, $type, $data_item);
 				}
-				$microdata_html .= '</div>';
+			}
+			$scope_html .= $structure[$type]["close"];
+			return $scope_html;
+		}
+
+		function prop($key, $value, $structure, $type, $data_item) {
+			$prop_html = "";
+			$prop_html .=  $structure[$type]["mid"][0] . $key . $structure[$type]["mid"][1] . $value . $structure[$type]["mid"][2];
+			return $prop_html;
+		}
+
+		$html .= $structure[$type]["wrap_start"];
+
+		if ( $type == "json-dl" ) {
+			$html .= '"@type": "' . $data_type . '",';
+		} else {
+			$html_scope = "itemscope itemtype='http://schema.org/{$data_type}'>";
+		}
+
+		foreach ($data as $data_key => $data_value ) {
+			if ( is_array($data_value) ) {
+				$html .= scope($data_key, $data_value, $structure, $type, $data_item);
 			} else {
-				$microdata_html .= '<meta itemprop="' . $microdata_key . '" content="' . $microdata_value . '">';
+				$html .= prop($data_key, $data_value, $structure, $type, $data_item);
 			}
 		}
-		return $microdata_html;
+		$html .= $structure[$type]["wrap_end"];
+
+		if ( $type == "json-dl" ) {
+			$html = str_replace(",}", "}", $html);
+		} else {
+			$html["content"] = $html;
+			$html["scope"] = $html_scope;
+		}
+		return $html;
 	}
 
 	// Render html and passing php vars
