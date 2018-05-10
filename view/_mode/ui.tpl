@@ -1,44 +1,64 @@
 <!-- UI mode -->
-<a class="scroll" data-scroll></a>
+<a class="scroll" id="scrollme"></a>
 <script>
 
-	scroll_option = {
-		scroll : document.body,
-		duration: 1000
+	// andjosh/animatedScrollTo.js
+	// gist.github.com/andjosh/6764939
+	let scrollme = document.querySelector("#scrollme")
+	let scrolltitle = document.querySelector("#title")
+	let scroll_path = 0
+
+	scrollPath()
+
+	scrollme.onclick = function() {
+		scrollTo(document.documentElement, scroll_path, 300)
 	}
 
-	function runScroll () {
-		scroll_path = scroll_option.scroll.scrollTop
-		scroll_time = scroll_option.duration
-		scrollTo(scroll_option.scroll, 0, scroll_option.duration)
+	function scrollPath() {
+		//stackoverflow.com/questions/3714628/jquery-get-the-location-of-an-element-relative-to-window
+		let elem = document.querySelector("#title")
+		let box = elem.getBoundingClientRect()
+		let body = document.body
+		let docEl = document.documentElement
+		let scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop
+		let clientTop = docEl.clientTop || body.clientTop || 0
+		let top = box.top + scrollTop - clientTop
+		scroll_path = top
 	}
-
-	var scrollme
-	var scroll_path = 0
-	var scroll_time = 0
-
-	scrollme = document.querySelector("[data-scroll]")
-	scrollme.addEventListener("click", runScroll, false)
 
 	function scrollTo(element, to, duration) {
 
-		if ( duration <= 0 ) return
-		var difference = to - element.scrollTop
+		let start = element.scrollTop
+		let change = to - start
+		let currentTime = 0
+		let increment = 20
 
-		setTimeout(function() {
-			element.scrollTop = scroll_path - easeInOutQuint(duration, scroll_path, difference, scroll_time)
-			if (element.scrollTop == to) return
-			scrollTo(element, to, duration - 10)
-		}, 10);
+		let animateScroll = function() {
+			currentTime += increment
+			let val = Math.easeInOutQuint(currentTime, start, change, duration)
+			element.scrollTop = val
+			if ( currentTime < duration ) {
+				setTimeout(animateScroll, increment)
+			}
+		}
+		animateScroll()
 	}
 
-	function easeInOutQuint(t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-		return c/2*((t-=2)*t*t*t*t + 2) + b;
+	//t = current time
+	//b = start value
+	//c = change in value
+	//d = duration
+	Math.easeInOutQuint = function (t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b
+		return c/2*((t-=2)*t*t*t*t + 2) + b
+	}
+
+	window.onresize = function() {
+		scrollPath()
 	}
 
 	window.onscroll = function() {
-		if ( document.body.scrollTop > 600 ) {
+		if ( document.documentElement.scrollTop > scroll_path ) {
 			scrollme.className = "scroll scroll-show";
 		} else {
 			scrollme.className = "scroll";
